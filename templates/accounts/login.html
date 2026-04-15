@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - SmartQuiz{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" style="padding: 40px 0;">
+    <div class="col-md-5">
+        <div class="container-main">
+            <h2 class="mb-4 text-center"><i class="bi bi-box-arrow-in-right"></i> Login</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.username.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.password.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}<br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </button>
+                
+                <p class="text-center mt-4">
+                    Don't have an account? <a href="{% url 'accounts:register' %}" class="fw-bold">Register here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

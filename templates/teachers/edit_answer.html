@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Answer - SmartQuiz{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-pencil"></i> Edit Answer</h1>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="container-main">
+            <h4 class="mb-4">Question: {{ answer.question.text }}</h4>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    {{ form.text.label_tag }}
+                    {{ form.text }}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            {{ form.is_correct }}
+                            {{ form.is_correct.label_tag }}
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.order.label_tag }}
+                        {{ form.order }}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Save Changes
+                </button>
+                <a href="{% url 'teachers:edit_question' answer.question.id %}" class="btn btn-secondary ms-2">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Available Quizzes - SmartQuiz{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-file-earmark-text"></i> Available Quizzes</h1>
+
+<div class="row mt-4">
+    {% if quizzes %}
+        {% for quiz in quizzes %}
+            <div class="col-md-6 mb-4">
+                <div class="card" style="height: 100%;">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ quiz.title }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ quiz.description }}</p>
+                        
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <small class="text-muted">Questions</small>
+                                <p class="fw-bold">{{ quiz.questions.count }}</p>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Duration</small>
+                                <p class="fw-bold">{{ quiz.duration_minutes }} min</p>
+                            </div>
+                            <div class="col-4">
+                                <small class="text-muted">Subject</small>
+                                <p class="fw-bold">{{ quiz.subject|default:"N/A" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Created by: <strong>{{ quiz.created_by.first_name }} {{ quiz.created_by.last_name }}</strong></small>
+                        </div>
+                        
+                        {% if quiz.id in attempted_quizzes %}
+                            <div class="alert alert-info mb-3">
+                                <i class="bi bi-check-circle"></i> You have already attempted this quiz
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-light">
+                        {% if quiz.id not in attempted_quizzes %}
+                            <a href="{% url 'students:take_quiz' quiz.id %}" class="btn btn-primary w-100">
+                                <i class="bi bi-play-circle"></i> Start Quiz
+                            </a>
+                        {% else %}
+                            <a href="{% url 'students:results' %}" class="btn btn-secondary w-100">
+                                <i class="bi bi-eye"></i> View Your Result
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No quizzes available at the moment. Please check back later.
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row mt-4 mb-4">
+    <div class="col-md-12">
+        <a href="{% url 'students:dashboard' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+{% endblock %}

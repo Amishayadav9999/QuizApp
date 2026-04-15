@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Performance - SmartQuiz{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-graph-up"></i> Performance Analytics</h1>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="container-main">
+            {% if analytics %}
+                <p>Average Score: {{ analytics.average_score }}%</p>
+                <p>Total Tests: {{ analytics.total_tests_taken }}</p>
+            {% else %}
+                <div class="alert alert-info">No analytics data yet.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

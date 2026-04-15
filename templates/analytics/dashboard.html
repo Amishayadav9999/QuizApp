@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard - SmartQuiz{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-graph-up"></i> Analytics Dashboard</h1>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="container-main">
+            <h4>Your Performance Overview</h4>
+            <p>Average Score: {{ stats.average_score|floatformat:1 }}%</p>
+            <p>Total Tests: {{ stats.total_tests }}</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard - SmartQuiz{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-trophy"></i> Student Leaderboard</h1>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="container-main">
+            <!-- Your Position -->
+            <div class="alert alert-primary mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h6 class="mb-1">Your Position</h6>
+                        <p class="mb-0"><strong>Rank:</strong> #{{ student_rank }}</p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <h6 class="mb-1">Your Average Score</h6>
+                        <p class="mb-0" style="font-size: 1.5rem; color: var(--primary-color);">{{ student_avg|floatformat:1 }}%</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Leaderboard Table -->
+            {% if leaderboard %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Rank</th>
+                            <th>Student Name</th>
+                            <th width="20%">Average Score</th>
+                            <th width="20%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in leaderboard %}
+                            <tr>
+                                <td>
+                                    {% if forloop.counter == 1 %}
+                                        <span class="badge bg-warning" style="font-size: 1rem;">🥇 1st</span>
+                                    {% elif forloop.counter == 2 %}
+                                        <span class="badge bg-secondary" style="font-size: 1rem;">🥈 2nd</span>
+                                    {% elif forloop.counter == 3 %}
+                                        <span class="badge bg-danger" style="font-size: 1rem;">🥉 3rd</span>
+                                    {% else %}
+                                        <strong>#{{ forloop.counter }}</strong>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ entry.student__first_name }} {{ entry.student__last_name }}</strong><br>
+                                    <small class="text-muted">@{{ entry.student__username }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge {% if entry.avg_percentage >= 80 %}bg-success{% elif entry.avg_percentage >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ entry.avg_percentage|floatformat:1 }}%
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'analytics:student_performance' entry.student__id %}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-graph-up"></i> Performance
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No leaderboard data available yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 mb-4">
+    <div class="col-md-12">
+        <a href="{% url 'students:dashboard' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+{% endblock %}

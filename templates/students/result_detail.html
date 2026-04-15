@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+
+{% block title %}Result - {{ result.quiz.title }} - SmartQuiz{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-file-earmark-check"></i> {{ result.quiz.title }} - Result</h1>
+
+<div class="row mt-4">
+    <!-- Result Summary Card -->
+    <div class="col-md-12 mb-4">
+        <div class="container-main">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h3>Your Score</h3>
+                    <div style="font-size: 3.5rem; font-weight: bold; color: var(--primary-color);">
+                        {{ result.score }} / {{ result.total_marks }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="circular-progress" style="text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary-color);">
+                            {{ result.percentage|floatformat:1 }}%
+                        </div>
+                        <div class="progress" style="height: 15px;">
+                            {% if result.percentage >= 80 %}
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: 100%;">Excellent</div>
+                            {% elif result.percentage >= 60 %}
+                                <div class="progress-bar bg-warning" role="progressbar" 
+                                     style="width: 100%;">Good</div>
+                            {% else %}
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: 100%;">Needs Improvement</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <!-- Performance Message -->
+            {% if result.percentage >= 80 %}
+                <div class="alert alert-success">
+                    <i class="bi bi-star-fill"></i> <strong>Outstanding Performance!</strong> 
+                    You have demonstrated excellent understanding of the material. Keep up the great work!
+                </div>
+            {% elif result.percentage >= 60 %}
+                <div class="alert alert-info">
+                    <i class="bi bi-hand-thumbs-up"></i> <strong>Great Job!</strong> 
+                    You have a good understanding. Review areas of weakness to improve further.
+                </div>
+            {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> <strong>Keep Practicing!</strong> 
+                    Don't be discouraged. Review the material and attempt more quizzes to improve.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Student Answers Review -->
+    <div class="col-md-12 mb-4">
+        <div class="container-main">
+            <h4><i class="bi bi-list-check"></i> Answer Review</h4>
+            
+            {% for answer in student_answers %}
+                <div style="margin-bottom: 20px; padding: 15px; border-left: 5px solid {% if answer.is_correct %}#10b981{% else %}#ef4444{% endif %}; background: {% if answer.is_correct %}#f0fdf4{% else %}#fef2f2{% endif %}; border-radius: 6px;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-2">
+                                Q{{ forloop.counter }}: {{ answer.question.text }}
+                                {% if answer.is_correct %}
+                                    <span class="badge bg-success ms-2">Correct</span>
+                                {% else %}
+                                    <span class="badge bg-danger ms-2">Incorrect</span>
+                                {% endif %}
+                            </h6>
+                            
+                            <div class="ms-3">
+                                <p class="mb-1"><small class="text-muted">Your Answer:</small></p>
+                                {% if answer.selected_answer %}
+                                    <p class="fw-bold">{{ answer.selected_answer.text }}</p>
+                                {% else %}
+                                    <p class="text-danger fw-bold">Not Answered</p>
+                                {% endif %}
+                                
+                                {% if not answer.is_correct %}
+                                    <p class="mb-0 mt-2"><small class="text-muted">Correct Answer:</small></p>
+                                    <p class="fw-bold text-success">
+                                        {% for ans in answer.question.answers.all %}
+                                            {% if ans.is_correct %}{{ ans.text }}{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            {% if answer.is_correct %}
+                                <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle text-danger" style="font-size: 2rem;"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- AI Suggestions -->
+    {% if suggestions %}
+        <div class="col-md-12 mb-4">
+            <div class="container-main">
+                <h4><i class="bi bi-lightbulb"></i> AI-Powered Suggestions</h4>
+                
+                {% for suggestion in suggestions %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            {% if suggestion.category == 'weak' %}
+                                <span class="badge bg-danger mb-2">⚠️ Weak Topic</span>
+                            {% elif suggestion.category == 'improvement' %}
+                                <span class="badge bg-warning mb-2">📈 Improvement Area</span>
+                            {% elif suggestion.category == 'strength' %}
+                                <span class="badge bg-success mb-2">⭐ Your Strength</span>
+                            {% else %}
+                                <span class="badge bg-info mb-2">📚 Learning Resource</span>
+                            {% endif %}
+                            
+                            <h6 class="mt-2">{{ suggestion.topic }}</h6>
+                            <p class="text-muted">{{ suggestion.suggestion_text }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Learning Resources & High-Score Strategies -->
+    <div class="col-md-12 mb-4">
+        <div class="container-main">
+            <h4><i class="bi bi-book"></i> Learning Resources & Improvement Tips</h4>
+            
+            {% if result.percentage >= 80 %}
+                <!-- Excellent Performance Tips -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-success h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-success">🎯 Excellent Performance!</h5>
+                                <p><strong>Current Score:</strong> {{ result.percentage }}%</p>
+                                <p class="text-muted">You've demonstrated strong understanding of this topic!</p>
+                                <ul class="small">
+                                    <li>✅ Maintain consistency with regular practice</li>
+                                    <li>✅ Help other students understand difficult concepts</li>
+                                    <li>✅ Challenge yourself with advanced topics</li>
+                                    <li>✅ Aim to reach 100% in your next attempt</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-info h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-info">📚 Recommended Resources</h5>
+                                <ul class="small">
+                                    <li><strong>Advanced Learning:</strong> Explore advanced theoretical concepts</li>
+                                    <li><strong>Documentation:</strong> Read official documentation</li>
+                                    <li><strong>Case Studies:</strong> Analyze real-world applications</li>
+                                    <li><strong>Practice Sets:</strong> Try harder difficulty quizzes</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% elif result.percentage >= 60 %}
+                <!-- Good Performance Tips -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-warning h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning">📈 Good Progress!</h5>
+                                <p><strong>Current Score:</strong> {{ result.percentage }}%</p>
+                                <p><strong>Score Gap to Excellence:</strong> {{ 80|add:0|add:result.percentage|add:"-80" }}% away from 80%</p>
+                                <p class="text-muted">You're on the right track! Focus on weak areas to improve.</p>
+                                <ul class="small">
+                                    <li>🎯 Complete 3-5 more practice quizzes</li>
+                                    <li>🎯 Identify and review answer explanations</li>
+                                    <li>🎯 Create flashcards for difficult concepts</li>
+                                    <li>🎯 Target: Improve by 10-20% in next attempt</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-secondary h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">📖 Study Method Recommendations</h5>
+                                <ul class="small">
+                                    <li><strong>Spaced Repetition:</strong> Review the material after 1 day, 3 days, 7 days</li>
+                                    <li><strong>Active Recall:</strong> Test yourself without looking at notes</li>
+                                    <li><strong>Feynman Technique:</strong> Explain concepts in simple words</li>
+                                    <li><strong>Group Study:</strong> Discuss difficult topics with peers</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Needs Improvement Tips -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-danger h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger">⚡ Keep Learning - You Can Do Better!</h5>
+                                <p><strong>Current Score:</strong> {{ result.percentage }}%</p>
+                                <p><strong>Target Score:</strong> 60% (Improvement: {{ 60|add:0|add:result.percentage|add:"-60" }}%)</p>
+                                <p class="text-muted">Don't worry! Improvement is just around the corner with proper practice.</p>
+                                <ul class="small">
+                                    <li>💪 Review fundamentals thoroughly</li>
+                                    <li>💪 Take 5+ more practice quizzes</li>
+                                    <li>💪 Make notes while studying</li>
+                                    <li>💪 Ask for help in weak areas</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-primary h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">📚 Essential Study Resources</h5>
+                                <ul class="small">
+                                    <li><strong>Videos:</strong> Watch YouTube tutorials for visual learning</li>
+                                    <li><strong>Textbooks:</strong> Read fundamental chapters thoroughly</li>
+                                    <li><strong>Online Courses:</strong> Take free courses on platforms (Coursera, Khan Academy)</li>
+                                    <li><strong>Practice Problems:</strong> Solve 10+ problems daily</li>
+                                    <li><strong>Study Groups:</strong> Join study sessions with classmates</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Weak Topic Improvement Plan -->
+            {% if weak_topics %}
+                <div class="card mt-3 border-danger">
+                    <div class="card-body">
+                        <h5 class="card-title">🎯 Personalized Improvement Plan</h5>
+                        <p class="text-muted">Focus on these weak areas to boost your score:</p>
+                        <div class="row">
+                            {% for topic_perf in weak_topics %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="alert alert-warning mb-2" style="margin-bottom: 0.5rem !important;">
+                                        <strong>{{ topic_perf.topic }}</strong> ({{ topic_perf.percentage_correct|floatformat:1 }}%)
+                                        <ul class="small mb-0 mt-2">
+                                            <li>📖 Read theory materials on this topic</li>
+                                            <li>✏️ Practice 5+ questions on this topic</li>
+                                            <li>🔄 Review answers and understand mistakes</li>
+                                            <li>⏰ Daily practice: 15-30 minutes for 1 week</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Learning Timeline -->
+            <div class="card mt-3 border-info">
+                <div class="card-body">
+                    <h5 class="card-title">📅 30-Day Improvement Timeline</h5>
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-2">
+                            <div class="border rounded p-3">
+                                <strong>Week 1</strong>
+                                <p class="small text-muted mt-2">Review basics & take 2 quizzes</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <div class="border rounded p-3">
+                                <strong>Week 2</strong>
+                                <p class="small text-muted mt-2">Deep dive into weak topics</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <div class="border rounded p-3">
+                                <strong>Week 3</strong>
+                                <p class="small text-muted mt-2">Intensive practice & revision</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <div class="border rounded p-3">
+                                <strong>Week 4</strong>
+                                <p class="small text-muted mt-2">Mock tests & final review</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="col-md-12">
+        <div class="container-main">
+            <a href="{% url 'students:dashboard' %}" class="btn btn-primary">
+                <i class="bi bi-speedometer2"></i> Back to Dashboard
+            </a>
+            <a href="{% url 'students:quizzes' %}" class="btn btn-secondary">
+                <i class="bi bi-file-earmark-text"></i> Take Another Quiz
+            </a>
+            <a href="{% url 'students:results' %}" class="btn btn-info">
+                <i class="bi bi-clock-history"></i> View All Results
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - SmartQuiz{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-speedometer2"></i> Student Dashboard</h1>
+
+<!-- Stats Row -->
+<div class="row mt-4">
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <i class="bi bi-file-earmark"></i>
+            <div class="stat-number">{{ stats.total_tests }}</div>
+            <div class="stat-label">Quizzes Attempted</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="stat-card success">
+            <i class="bi bi-percent"></i>
+            <div class="stat-number">{{ stats.average_score|floatformat:1 }}%</div>
+            <div class="stat-label">Average Score</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="stat-card warning">
+            <i class="bi bi-trophy"></i>
+            <div class="stat-number">{{ stats.highest_score|floatformat:0 }}%</div>
+            <div class="stat-label">Highest Score</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="stat-card danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            <div class="stat-number">{{ stats.weak_topics.count }}</div>
+            <div class="stat-label">Weak Topics</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Recent Results -->
+    <div class="col-md-6">
+        <div class="container-main">
+            <h4><i class="bi bi-clock-history"></i> Recent Results</h4>
+            
+            {% if stats.recent_results %}
+                <div class="list-group mt-3">
+                    {% for result in stats.recent_results %}
+                        <a href="{% url 'students:result_detail' result.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ result.quiz.title }}</h6>
+                                    <small class="text-muted">{{ result.attempted_at|date:"M d, Y H:i" }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-primary">{{ result.score }}/{{ result.total_marks }}</span>
+                                    <h5 class="mb-0">{{ result.percentage|floatformat:1 }}%</h5>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> You haven't attempted any quizzes yet. <a href="{% url 'students:quizzes' %}">Start a quiz</a>
+                </div>
+            {% endif %}
+            
+            <a href="{% url 'students:results' %}" class="btn btn-sm btn-primary mt-3">View All Results</a>
+        </div>
+    </div>
+    
+    <!-- Weak Topics -->
+    <div class="col-md-6">
+        <div class="container-main">
+            <h4><i class="bi bi-exclamation-lg"></i> Weak Topics</h4>
+            
+            {% if stats.weak_topics %}
+                <div class="list-group mt-3">
+                    {% for topic in stats.weak_topics %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-2">{{ topic.topic }}</h6>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-danger" role="progressbar" 
+                                             style="width: {{ topic.percentage_correct }}%">
+                                            {{ topic.percentage_correct|floatformat:1 }}%
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ topic.correct_attempts }}/{{ topic.total_attempts }} correct</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i> No weak topics identified. Great job!
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- AI Suggestions -->
+{% if stats.suggestions %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="container-main">
+                <h4><i class="bi bi-lightbulb"></i> AI Suggestions</h4>
+                
+                <div class="row mt-3">
+                    {% for suggestion in stats.suggestions %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    {% if suggestion.category == 'weak' %}
+                                        <span class="badge bg-danger mb-2">Weak Topic</span>
+                                    {% elif suggestion.category == 'improvement' %}
+                                        <span class="badge bg-warning mb-2">Improvement</span>
+                                    {% elif suggestion.category == 'strength' %}
+                                        <span class="badge bg-success mb-2">Strength</span>
+                                    {% else %}
+                                        <span class="badge bg-info mb-2">Resource</span>
+                                    {% endif %}
+                                    
+                                    <h6 class="mt-2">{{ suggestion.topic }}</h6>
+                                    <p class="small text-muted">{{ suggestion.suggestion_text }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <a href="{% url 'analytics:dashboard' %}" class="btn btn-sm btn-primary mt-3">View All Suggestions</a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Action Buttons -->
+<div class="row mt-4 mb-4">
+    <div class="col-md-12">
+        <a href="{% url 'students:quizzes' %}" class="btn btn-lg btn-primary me-2">
+            <i class="bi bi-file-earmark-text"></i> Take a Quiz
+        </a>
+        <a href="{% url 'students:leaderboard' %}" class="btn btn-lg btn-secondary">
+            <i class="bi bi-trophy"></i> View Leaderboard
+        </a>
+    </div>
+</div>
+
+{% endblock %}

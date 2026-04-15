@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Quiz - SmartQuiz{% endblock %}
+
+{% block content %}
+<h1 class="page-title"><i class="bi bi-plus-circle"></i> Create New Quiz</h1>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="container-main">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    {{ form.title.label_tag }}
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.subject.label_tag }}
+                        {{ form.subject }}
+                        {% if form.subject.errors %}
+                            <div class="text-danger small mt-1">{{ form.subject.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.duration_minutes.label_tag }}
+                        {{ form.duration_minutes }}
+                        {% if form.duration_minutes.errors %}
+                            <div class="text-danger small mt-1">{{ form.duration_minutes.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-check-circle"></i> Create Quiz
+                </button>
+                <a href="{% url 'teachers:quiz_list' %}" class="btn btn-secondary btn-lg ms-2">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
