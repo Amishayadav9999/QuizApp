@@ -29,6 +29,12 @@
                             {{ form.password.errors.0 }}
                         </div>
                     {% endif %}
+                    <!-- ✅ Forgot Password Link -->
+                    <div class="text-end mt-2">
+                        <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none small">
+                            Forgot Password?
+                        </a>
+                    </div>
                 </div>
                 
                 {% if form.non_field_errors %}
